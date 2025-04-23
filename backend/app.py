@@ -190,7 +190,7 @@ def score_position(board, piece):
 
     return score
 
-# Game state functionst
+# Game state functions
 def get_valid_moves(board):
     column_count = len(board[0])
     return [col for col in range(column_count) if board[0][col] == EMPTY]
@@ -391,6 +391,10 @@ async def make_move(game_state: GameState) -> AIResponse:
                     return AIResponse(move=col)
         
         raise HTTPException(status_code=400, detail=str(e))
+    
+@app.get("/api/test")
+async def health_check():
+    return {"status": "ok", "message": "Server is running"}
 
 # Run the application
 if __name__ == "__main__":

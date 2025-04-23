@@ -33,6 +33,7 @@ class GameState(BaseModel):
     board: List[List[int]]
     current_player: int
     valid_moves: List[int]
+    is_new_game: bool
 
 class AIResponse(BaseModel):
     move: int
@@ -339,6 +340,13 @@ async def make_move(game_state: GameState) -> AIResponse:
         board = game_state.board
         valid_moves = game_state.valid_moves
         
+        # Xử lý khi bắt đầu ván mới
+        if game_state.is_new_game:
+            # Reset transposition table khi bắt đầu ván mới
+            global transposition_table
+            transposition_table = {}
+            print("Bắt đầu ván mới - Đã reset transposition table")
+        
         # Update global variables
         global PLAYER_PIECE, AI_PIECE
         AI_PIECE = game_state.current_player
@@ -354,7 +362,7 @@ async def make_move(game_state: GameState) -> AIResponse:
             raise ValueError("Không có nước đi hợp lệ sau khi xác minh")
         
         # Use minimax algorithm to select the best move
-        selected_col, minimax_score = minimax(board, 7, -math.inf, math.inf, True)
+        selected_col, minimax_score = minimax(board, 5, -math.inf, math.inf, True)
         
         # Fallback to random move if needed
         if selected_col is None or selected_col not in verified_valid_moves:
@@ -374,6 +382,12 @@ async def make_move(game_state: GameState) -> AIResponse:
         
         # Print the board state
         print_board(board, (row, selected_col))
+        
+        # Kiểm tra xem game đã kết thúc chưa
+        if winning_move(board, AI_PIECE):
+            print("AI thắng!")
+        elif len(get_valid_moves(board)) == 0:
+            print("Ván cờ hòa!")
         
         return AIResponse(move=selected_col)
     except Exception as e:

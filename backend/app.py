@@ -173,7 +173,7 @@ def score_position(board, piece):
     # Score center column
     center_array = [int(i) for i in list(board_array[:, column_count//2])]
     center_count = center_array.count(piece)
-    score += center_count * 3
+    score += center_count * 4
 
     # Score horizontal
     for r in range(row_count):
